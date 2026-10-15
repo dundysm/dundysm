@@ -1,0 +1,58 @@
+{
+  "rows": [
+    [
+      {"label": "inference serving", "accent": "#8fd3c1", "items": [
+        {"repo": "vllm-project/production-stack", "prs": [1089, 1071, 1088],
+         "desc": "prefix-aware routing fell back to windowed qps, which pinned sessions to saturated backends; now least-inflight"},
+        {"repo": "ray-project/ray", "prs": [66307],
+         "desc": "handle-metric staleness compared clocks across machines; now aged by the controller's monotonic receive time"},
+        {"repo": "ai-dynamo/dynamo", "prs": [15371],
+         "desc": "p/d decode dropped multi_modal_data, so same-size images collided in the prefix cache and reused each other's kv"},
+        {"repo": "NVIDIA/TensorRT-Model-Connect", "prs": [1284],
+         "desc": "zephyr and tinyllama chat templates were misdetected as phi, so the first decode step returned eos"},
+        {"repo": "ai-dynamo/aiperf", "prs": [1419],
+         "desc": "a missing dcgm hostname label failed validation inside a swallowed task and hung aiperf profile"}
+      ]},
+      {"label": "robotics & sim", "accent": "#a3bde9", "items": [
+        {"repo": "google-deepmind/mujoco_menagerie", "prs": [334],
+         "desc": "go2 mjx back-thigh range and calf torque (24 vs 45.43 nm) had drifted from the urdf; now they match"},
+        {"repo": "moveit/moveit2", "prs": [3853],
+         "desc": "execution_complete_ was a plain bool read outside its mutex, a c++ data race; now std::atomic"},
+        {"repo": "newton-physics/newton", "prs": [4671],
+         "desc": "sky/ground ambient and per-light color for SensorCamera, wired into the warp kernel; defaults render unchanged"},
+        {"repo": "Roboparty/rpo_description", "prs": [5],
+         "desc": "15 mjcf joint ranges and every motor limit had drifted from the urdf; synced, plus a script that fails on drift"}
+      ]}
+    ],
+    [
+      {"label": "gpu clusters", "accent": "#d4af37", "items": [
+        {"repo": "NVIDIA/gpu-operator", "prs": [2843],
+         "desc": "the operator and its helm hook jobs ran without a securityContext; restricted defaults for k8s and openshift"},
+        {"repo": "Mellanox/network-operator", "prs": [3189, 3190],
+         "desc": "the rdma shared device plugin assumed /var/lib/kubelet; the kubelet root is now configurable through helm"},
+        {"repo": "Mellanox/maintenance-operator", "prs": [243],
+         "desc": "the controller oomkilled at 128Mi on ~141 nodes (idle 130-156Mi); raised to 256Mi with sizing guidance"}
+      ]},
+      {"label": "training & kernels", "accent": "#eaa16f", "items": [
+        {"repo": "NVIDIA/TransformerEngine", "prs": [3565],
+         "desc": "non-fp8 gemm never set cublaslt's bias dtype, so a bf16 bias read as fp32 ran out of bounds; now rejected"},
+        {"repo": "huggingface/candle", "prs": [3973],
+         "desc": "rms_norm always failed on an unconditional bias lookup and lazy VarMap init broke; both work again"},
+        {"repo": "NVIDIA-NeMo/Automodel", "prs": [3999],
+         "desc": "nemotron-h checkpoints saved with a singular embedding key failed dtensor load; both key forms now map"}
+      ]}
+    ]
+  ],
+  "review_orgs": ["NVIDIA", "vllm-project", "google-deepmind", "huggingface", "ray-project", "flashinfer-ai", "ollama", "kubernetes-sigs",
+                  "kserve", "ai-dynamo", "NVIDIA-Omniverse", "Roboparty", "openvla", "mujocolab", "aws", "Mellanox"],
+  "projects": [
+    {"img": "covers/forgetting.png", "href": "https://dundysm.github.io/forgetting/", "alt": "forgetting"},
+    {"img": "covers/center-of-mass.png", "href": "https://dundysm.github.io/center-of-mass/", "alt": "center of mass"},
+    {"img": "covers/inference-under-pressure.png", "href": "https://github.com/dundysm/inference-under-pressure", "alt": "inference under pressure"},
+    {"img": "covers/sea-of-fog.png", "href": "https://github.com/dundysm/sea-of-fog", "alt": "sea of fog: typesafe's new jev model takes napoleon's bait at austerlitz 79% of the time; one warning line cuts that to 44%"},
+    {"img": "covers/gaitkeeper.png", "href": "https://github.com/dundysm/gaitkeeper", "alt": "gaitkeeper"},
+    {"img": "covers/inference-doctor.png", "href": "https://github.com/dundysm/inference-doctor", "alt": "inference doctor"},
+    {"img": "covers/retinaflow.png", "href": "https://chromewebstore.google.com/detail/retinaflow/pldbmpjgjikjadekeikikhomahjeplee", "alt": "retinaflow"},
+    {"img": "covers/spine-ai.png", "href": "https://dundysm.com", "alt": "spine ai"}
+  ]
+}
