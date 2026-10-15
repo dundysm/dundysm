@@ -1,32 +1,30 @@
-"""Build the profile README: a dark bookshelf. One cover per upstream repo with merged work, one for open PRs,
-one per own project, plus a header, a section label and a footer.
+"""Build the profile README from shelf.json: merged upstream work as four area cards, open PRs, own projects.
 
-    uv run --with pillow build.py           render covers/*.webp and README.md from shelf.json
-    uv run --with pillow build.py --check   list upstream PRs (merged or open) that shelf.json doesn't cover yet
+    uv run --no-project --with pillow python build.py           render img/*.webp and README.md
+    uv run --no-project --with pillow python build.py --check   list upstream PRs that shelf.json doesn't cover yet
 
-Titles are written by hand in shelf.json. Every image carries its own dark background and the README sets them
-inline with no whitespace between them (widths summing to 100% per row), so the shelf reads as one dark panel in
-GitHub's light theme too. GitHub strips style and bgcolor; align="top" removes the gap under each row of inline
-images, while align="left" would float them but GitHub pads floated images by 20px. No totals are printed anywhere.
-Images are rendered by headless Chrome (fonts: Newsreader and JetBrains Mono from Google Fonts, both OFL).
+The whole panel is laid out once as an HTML page (dark, Newsreader + JetBrains Mono, both OFL) and headless Chrome
+screenshots it. The page also reports where its bands and columns are, and each cell becomes its own image, so
+every PR stays a link (GitHub shows its hovercard). The README sets the images inline, edge to edge, with
+align="top": GitHub strips style and bgcolor and pads floated images, so this is what keeps the panel one dark
+block in GitHub's light theme too. Titles are written by hand. No totals are printed anywhere, on purpose.
 """
 import base64, html, json, mimetypes, pathlib, re, subprocess, sys, urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent
 CACHE = ROOT / ".cache"
-COVERS = ROOT / "covers"
+IMG = ROOT / "img"
 USER = "dundysm"
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 FONTS = ("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500"
          "&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=block")
-INK = "#f4f1eb"
-PANEL = "#0d1117"          # GitHub's dark page background, so the panel disappears into it in dark mode
+W = 846        # GitHub profile README content width at a 1280px window; images scale with it anyway
+SCALE = 2
 GOLD = "#d4af37"
-TILE_W, TILE_H = 440, 664  # one cover (400x600) plus its gutter and a strip of shelf
-ROW_W = 4 * TILE_W
+MERGED = f"https://github.com/search?q=author%3A{USER}+is%3Apr+is%3Amerged+-user%3A{USER}&type=pullrequests"
+OPEN = f"https://github.com/search?q=author%3A{USER}+is%3Apr+is%3Aopen+-user%3A{USER}&type=pullrequests"
 
 shelf = json.loads((ROOT / "shelf.json").read_text(encoding="utf-8"))
-DOM = shelf["domains"]
 
 
 def gh_prs(state):
@@ -42,7 +40,7 @@ def data_uri(path):
 
 
 def logo(org):
-    """GitHub org avatar, cached; it is only ever baked into a cover."""
+    """GitHub org avatar, cached; it is only ever baked into an image."""
     p = CACHE / "logos" / f"{org}.png"
     if not p.exists():
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -55,208 +53,162 @@ def esc(s):
     return html.escape(s, quote=True)
 
 
-BASE_CSS = f"""
-html,body{{margin:0;background:{PANEL};color:{INK};font-family:'JetBrains Mono',monospace;overflow:hidden}}
-.serif{{font-family:Newsreader,serif}}
-"""
-
-# logos sit inside a circle on their own background colour, sampled from the avatar's corner once it has loaded
-LOGO_JS = """<script>
-addEventListener('load', () => { for (const im of document.querySelectorAll('.l img')) {
-  const k = document.createElement('canvas'); k.width = k.height = 64; const g = k.getContext('2d');
-  g.drawImage(im, 0, 0, 64, 64); const [r, gg, b, a] = g.getImageData(2, 2, 1, 1).data;
-  if (a > 200) im.parentElement.style.background = `rgb(${r},${gg},${b})`;
-} });
-</script>"""
+def lg(org, size):
+    return f'<div class="l" style="width:{size}px;height:{size}px"><img src="{logo(org)}"></div>'
 
 
-def cover_page(inner, bg, accent, extra=""):
-    css = f"""{BASE_CSS}
-.tile{{position:relative;width:{TILE_W}px;height:{TILE_H}px}}
-.plank{{position:absolute;left:0;right:0;top:624px;height:14px;background:linear-gradient(180deg,#252b34,#171c23);
-   box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}}
-.plank:after{{content:"";position:absolute;left:0;right:0;top:14px;height:20px;background:linear-gradient(180deg,rgba(0,0,0,.45),transparent)}}
-.drop{{position:absolute;left:28px;right:12px;top:612px;height:16px;border-radius:50%;background:rgba(0,0,0,.6);filter:blur(7px)}}
-.c{{position:absolute;left:20px;top:24px;width:400px;height:600px;box-sizing:border-box;overflow:hidden;border-radius:3px 7px 4px 3px;
-   background:radial-gradient(130% 70% at 25% 0%,rgba(255,255,255,.075),transparent 62%),radial-gradient(90% 60% at 80% 110%,rgba(0,0,0,.28),transparent 70%),{bg};
-   box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);padding:38px 32px 30px 54px}}
-.c:before{{content:"";position:absolute;z-index:3;left:0;top:0;bottom:0;width:22px;
-   background:linear-gradient(90deg,rgba(0,0,0,.42),rgba(255,255,255,.08) 55%,rgba(0,0,0,.3))}}
-.c:after{{content:"";position:absolute;z-index:3;left:22px;top:0;bottom:0;width:1px;background:rgba(0,0,0,.4);box-shadow:1px 0 0 rgba(255,255,255,.06)}}
-.top{{position:relative;z-index:2;display:flex;justify-content:space-between;font-size:15px;letter-spacing:.12em;color:{accent}}}
-.top .n{{color:rgba(244,241,235,.45);letter-spacing:.06em}}
-.rule{{position:relative;z-index:2;width:36px;height:2px;background:{accent};margin-top:14px}}
-.pin{{width:100px;height:100px;margin:34px auto 0;padding:7px;border-radius:50%;border:1.5px solid {accent};box-shadow:0 14px 34px rgba(0,0,0,.35)}}
-.l{{border-radius:50%;background:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center}}
+def pr_link(it):
+    prs = it["prs"]
+    return (f"https://github.com/{it['repo']}/pull/{prs[0]}" if len(prs) == 1 else
+            f"https://github.com/{it['repo']}/pulls?q=is%3Apr+author%3A{USER}+is%3Amerged")
+
+
+def band(inner, links, alts, cls="", cols=False):
+    """One horizontal band of the panel. With cols, each child of the band is its own image and link."""
+    return (f"<div class=\"band {cls}\"{' data-cols' if cols else ''} data-links='{esc(json.dumps(links))}' "
+            f"data-alts='{esc(json.dumps(alts))}'>{inner}</div>")
+
+
+def page():
+    out = [band('<div class="sec">merged upstream</div>', [MERGED], ["merged upstream"], "top")]
+    areas = shelf["areas"]
+    for a, b in zip(areas[0::2], areas[1::2]):
+        n = max(len(a["items"]), len(b["items"]))
+        for k in range(n):
+            # the header rides on the first row and the card's foot on the last: GitHub gives every line of inline
+            # images a 24px strut, so a slice shorter than that would leave a page-coloured seam under it
+            cells, links, alts = "", [], []
+            for x in (a, b):
+                cls = "cell" + (" first" if k == 0 else "") + (" last" if k == n - 1 else "")
+                head = (f'<div class="ch"><span class="sw" style="background:{x["accent"]}"></span>{esc(x["label"])}</div>'
+                        if k == 0 else "")
+                if k < len(x["items"]):
+                    it = x["items"][k]
+                    body = (f'<div class="it">{lg(it["repo"].split("/")[0], 20)}<div>'
+                            f'<div class="rn">{esc(it["repo"])}</div><div class="fx">{esc(it["title"])}</div></div></div>')
+                    links.append(pr_link(it)); alts.append(f"{it['repo']}: {it['title']}")
+                else:
+                    body = ""
+                    links.append(MERGED); alts.append(x["label"])
+                cells += f'<div class="{cls}">{head}{body}</div>'
+            out.append(band(cells, links, alts, "pair" + (" end" if k == n - 1 else ""), cols=True))
+
+    logos = "".join(lg(o, 20) for o in shelf["review_orgs"])
+    out.append(band(f'<div class="rv"><span>in review</span><span class="lgs">{logos}</span></div>', [OPEN], ["more prs, in review upstream"], "review"))
+
+    cards = "".join(
+        f'<div class="b"><div class="th"><img src="{data_uri(ROOT / e["art"])}" style="object-position:{e["pos"]}"></div>'
+        f'<div class="bn">{esc(e["name"])}</div><div class="bs">{esc(e["sub"])}</div></div>' for e in shelf["built"])
+    out.append(band(f'<div class="sec">built</div><div class="bg" data-cols>{cards}</div>',
+                    [f"https://github.com/{e['repo']}" for e in shelf["built"]],
+                    [f"{e['repo']}: {e['sub']}" for e in shelf["built"]], "built"))
+
+    css = f"""
+html,body{{margin:0;background:#0d1117;color:#f4f1eb}}
+#panel{{width:{W}px}}
+.band{{padding:0 36px}}
+.l{{border-radius:50%;background:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:none}}
 .l img{{width:78%;height:78%;object-fit:contain}}
-.pin .l{{width:100px;height:100px}}
-.t{{font-family:Newsreader,serif;font-weight:400;font-size:38px;line-height:1.1;letter-spacing:-.005em;margin-top:30px;font-variation-settings:'opsz' 48}}
-.bot{{position:absolute;z-index:2;left:54px;right:32px;bottom:30px}}
-.hr{{height:1px;background:rgba(244,241,235,.14);margin-bottom:16px}}
-.org{{font-size:16px;color:rgba(244,241,235,.55)}}
-.name{{font-size:22px;font-weight:500;margin-top:3px;word-break:break-all}}
-.meta{{display:flex;justify-content:space-between;margin-top:14px;font-size:15px;letter-spacing:.02em}}
-.meta .m{{color:{accent}}} .meta .d{{color:rgba(244,241,235,.45)}}
-.grid{{display:grid;grid-template-columns:repeat(4,56px);gap:12px;justify-content:center;margin-top:34px}}
-.grid .l{{width:56px;height:56px;box-shadow:0 0 0 1.5px rgba(244,241,235,.16),0 8px 18px rgba(0,0,0,.3)}}
-.art{{position:absolute;z-index:1;left:23px;right:0;top:0;height:350px}}
-.art img{{width:100%;height:100%;object-fit:cover;display:block}}
-.art:after{{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent 26%,transparent 42%,{bg} 98%)}}
-.built .top{{color:{INK};text-shadow:0 1px 6px rgba(0,0,0,.6)}} .built .rule{{box-shadow:0 1px 6px rgba(0,0,0,.5)}}
-.built .t{{position:absolute;z-index:2;left:54px;right:32px;top:318px;margin:0;font-size:44px}}
-.sub{{position:absolute;z-index:2;left:54px;right:32px;top:380px;font-family:Newsreader,serif;font-style:italic;font-size:21px;line-height:1.25;
-   color:rgba(244,241,235,.72);font-variation-settings:'opsz' 20}}
-{extra}"""
+.sec{{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:{GOLD}}}
+.top{{padding-top:34px;padding-bottom:24px}}
+.pair{{display:grid;grid-template-columns:1fr 1fr;column-gap:14px}}
+.cell{{border-left:1px solid rgba(244,241,235,.09);border-right:1px solid rgba(244,241,235,.09);background:rgba(255,255,255,.018);padding:0 20px}}
+.cell.first{{border-top:1px solid rgba(244,241,235,.09);border-radius:8px 8px 0 0}}
+.cell.last{{border-bottom:1px solid rgba(244,241,235,.09);border-radius:0 0 8px 8px;padding-bottom:8px}}
+.ch{{padding-top:18px;padding-bottom:10px;font-family:Newsreader,serif;font-size:22px;display:flex;align-items:center;gap:10px}}
+.sw{{width:18px;height:3px;border-radius:2px}}
+.end{{padding-bottom:14px}}
+.it{{display:flex;gap:12px;align-items:flex-start;padding:11px 0;min-height:50px;border-top:1px solid rgba(244,241,235,.06)}}
+.it .l{{margin-top:2px}}
+.rn{{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(244,241,235,.9)}}
+.fx{{font-family:Newsreader,serif;font-size:15px;color:rgba(244,241,235,.66);margin-top:2px;line-height:1.3}}
+.review{{padding-top:26px;padding-bottom:26px}}
+.rv{{display:flex;align-items:center;gap:16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:{GOLD}}}
+.lgs{{display:flex;gap:6px}}
+.built{{padding-top:12px;padding-bottom:30px}}
+.built .sec{{margin-bottom:14px}}
+.bg{{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}}
+.th{{aspect-ratio:16/10;border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08)}}
+.th img{{width:100%;height:100%;object-fit:cover;display:block}}
+.bn{{font-family:Newsreader,serif;font-size:19px;margin-top:9px}}
+.bs{{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(244,241,235,.5);margin-top:3px;line-height:1.35}}
+"""
+    js = """<script>
+addEventListener('load', () => {
+  for (const im of document.querySelectorAll('.l img')) {   // logo circle takes the avatar's own corner colour
+    const k = document.createElement('canvas'); k.width = k.height = 64; const g = k.getContext('2d');
+    g.drawImage(im, 0, 0, 64, 64); const [r, gg, b, a] = g.getImageData(2, 2, 1, 1).data;
+    if (a > 200) im.parentElement.style.background = `rgb(${r},${gg},${b})`;
+  }
+  document.fonts.ready.then(() => {                          // report band rows and column cuts for slicing
+    const P = document.getElementById('panel').getBoundingClientRect();
+    const bands = [...document.querySelectorAll('.band')].map(b => {
+      const r = b.getBoundingClientRect();
+      const box = b.hasAttribute('data-cols') ? b : b.querySelector('[data-cols]');
+      let cuts = [0, P.width];
+      if (box) { const k = [...box.children].map(c => c.getBoundingClientRect());
+                 cuts = [0, ...k.slice(1).map((c, i) => (k[i].right + c.left) / 2), P.width]; }
+      return {y0: r.top, y1: r.bottom, cuts, links: JSON.parse(b.dataset.links), alts: JSON.parse(b.dataset.alts)};
+    });
+    const pre = document.createElement('pre'); pre.id = 'layout'; pre.style.display = 'none';
+    pre.textContent = JSON.stringify({W: P.width, H: P.height, bands}); document.body.appendChild(pre);
+  });
+});
+</script>"""
     return (f'<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="{FONTS}"><style>{css}</style></head>'
-            f'<body><div class="tile"><div class="plank"></div><div class="drop"></div>{inner}</div>{LOGO_JS}</body></html>')
+            f'<body><div id="panel">{"".join(out)}</div>{js}</body></html>')
 
 
-def strip_page(inner, height, css):
-    return (f'<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="{FONTS}"><style>{BASE_CSS}'
-            f'.s{{position:relative;width:{ROW_W}px;height:{height}px;box-sizing:border-box;padding:0 44px}}{css}</style></head>'
-            f'<body><div class="s">{inner}</div></body></html>')
-
-
-def bottom(org, name, left, right=""):
-    return (f'<div class="bot"><div class="hr"></div><div class="org">{esc(org)}/</div><div class="name">{esc(name)}</div>'
-            f'<div class="meta"><span class="m">{esc(left)}</span><span class="d">{esc(right)}</span></div></div>')
-
-
-def merged_cover(e):
-    d = DOM[e["domain"]]; org, name = e["repo"].split("/")
-    prs = e["prs"]
-    left = f"merged · #{prs[0]}" if len(prs) == 1 else f"{len(prs)} merged · #{prs[0]} +{len(prs) - 1}"
-    inner = (f'<div class="c"><div class="top"><span>{d["label"]}</span><span class="n">{esc(e["date"])}</span></div><div class="rule"></div>'
-             f'<div class="pin"><div class="l"><img src="{logo(org)}"></div></div><div class="t">{esc(e["title"])}</div>'
-             + bottom(org, name, left) + "</div>")
-    return cover_page(inner, d["bg"], d["accent"])
-
-
-def review_cover():
-    d = DOM["review"]
-    imgs = "".join(f'<div class="l"><img src="{logo(o)}"></div>' for o in shelf["review_orgs"][:16])
-    inner = (f'<div class="c"><div class="top"><span>{d["label"]}</span><span class="n">open</span></div><div class="rule"></div>'
-             f'<div class="grid">{imgs}</div><div class="t" style="margin-top:34px">{esc(shelf["review_title"])}</div>'
-             f'<div class="bot"><div class="hr"></div><div class="meta" style="margin-top:0"><span class="m">open prs, upstream</span>'
-             f'<span class="d"></span></div></div></div>')
-    return cover_page(inner, d["bg"], d["accent"])
-
-
-def built_cover(e):
-    d = DOM["built"]; org, name = e["repo"].split("/")
-    inner = (f'<div class="c built"><div class="art"><img src="{data_uri(ROOT / e["art"])}" style="object-position:{e["pos"]}"></div>'
-             f'<div class="top"><span>{d["label"]}</span><span class="n"></span></div><div class="rule"></div>'
-             f'<div class="t">{esc(e["name"])}</div><div class="sub">{esc(e["sub"])}</div>'
-             + bottom(org, name, e["tags"]) + "</div>")
-    return cover_page(inner, d["bg"], d["accent"])
-
-
-LABEL_CSS = f""".lab{{position:absolute;left:64px;bottom:22px;font-size:26px;letter-spacing:.12em;color:{GOLD}}}
-.lab:after{{content:"";display:block;width:44px;height:2px;background:{GOLD};margin-top:16px}}"""
-
-
-def header_page():
-    h = shelf["header"]
-    inner = (f'<div class="nm serif">{esc(h["name"])}</div><div class="tg">{esc(h["tagline"])}</div>'
-             f'<div class="in serif">{esc(h["intro"])}</div><div class="lab">merged upstream</div>')
-    css = f"""{LABEL_CSS}
-.nm{{position:absolute;left:62px;top:70px;font-size:80px;line-height:1;letter-spacing:-.01em;font-variation-settings:'opsz' 72}}
-.tg{{position:absolute;left:66px;top:172px;font-size:26px;letter-spacing:.04em;color:rgba(244,241,235,.55)}}
-.in{{position:absolute;left:64px;top:232px;width:1240px;font-size:36px;line-height:1.3;color:rgba(244,241,235,.82);font-variation-settings:'opsz' 30}}"""
-    return strip_page(inner, 420, css)
-
-
-def label_page(text):
-    return strip_page(f'<div class="lab">{esc(text)}</div>', 150, LABEL_CSS)
-
-
-def footer_page(text, width):
-    css = f""".s{{width:{width}px!important;padding:0!important}}
-.f{{position:absolute;left:0;right:0;top:46px;text-align:center;font-size:26px;letter-spacing:.04em;color:rgba(244,241,235,.62)}}
-.f b{{font-weight:400;color:{GOLD}}}"""
-    return strip_page(f'<div class="f">{text}</div>', 140, css)
-
-
-def render(html_text, out, w, h, scale):
-    """HTML -> headless Chrome PNG -> lossy WebP. Opaque, so tiles butt together without seams."""
-    from PIL import Image
-    out_png = CACHE / "png" / (out.stem + ".png")
-    src = CACHE / "html" / (out.stem + ".html")
-    for p in (out_png, src, out):
-        p.parent.mkdir(parents=True, exist_ok=True)
-    src.write_text(html_text, encoding="utf-8")
-    subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars", f"--user-data-dir={CACHE / 'chrome'}",
-                    f"--force-device-scale-factor={scale}", f"--window-size={w},{h}",
-                    "--virtual-time-budget=8000", f"--screenshot={out_png}", src.as_uri()],
-                   check=True, capture_output=True)
-    Image.open(out_png).convert("RGB").save(out, "WEBP", quality=90, method=6)
-    print("  ", out.relative_to(ROOT), f"{out.stat().st_size // 1024} KB")
-
-
-def slug(s):
-    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
-
-
-def tile(href, src, alt, width):
-    return f'<a href="{esc(href)}"><img src="{src}" width="{width}" align="top" alt="{esc(alt)}"></a>'
+def chrome(src, *args):
+    return subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars", f"--user-data-dir={CACHE / 'chrome'}",
+                           "--virtual-time-budget=8000", *args, src.as_uri()], check=True, capture_output=True, text=True,
+                          encoding="utf-8").stdout
 
 
 def check():
-    have = {(e["repo"], n) for e in shelf["merged"] for n in e["prs"]}
+    have = {(it["repo"], n) for a in shelf["areas"] for it in a["items"] for n in it["prs"]}
     new = [p for p in gh_prs("merged") if (p["repository"]["nameWithOwner"], p["number"]) not in have]
     for p in new:
-        print(f"merged, not on the shelf: {p['repository']['nameWithOwner']}#{p['number']} {p['title']}")
+        print(f"merged, not in shelf.json: {p['repository']['nameWithOwner']}#{p['number']} {p['title']}")
     orgs = {p["repository"]["nameWithOwner"].split("/")[0] for p in gh_prs("open")}
     missing = sorted(orgs - set(shelf["review_orgs"]))
     if missing:
-        print("open-PR orgs without a logo on the review cover:", ", ".join(missing))
+        print("open-PR orgs without a logo in the review row:", ", ".join(missing))
     if not new and not missing:
-        print("shelf is up to date")
+        print("shelf.json is up to date")
 
 
 def build():
-    for old in [*COVERS.glob("*.png"), *COVERS.glob("*.webp")]:
+    from PIL import Image
+    CACHE.mkdir(exist_ok=True)
+    src = CACHE / "panel.html"
+    src.write_text(page(), encoding="utf-8")
+    dom = chrome(src, "--window-size=%d,3000" % W, "--dump-dom")
+    layout = json.loads(html.unescape(re.search(r'<pre id="layout"[^>]*>(.*?)</pre>', dom, re.S).group(1)))
+    shot = CACHE / "panel.png"
+    chrome(src, f"--force-device-scale-factor={SCALE}", f"--window-size={W},{int(layout['H']) + 1}", f"--screenshot={shot}")
+    full = Image.open(shot).convert("RGB")
+
+    for old in IMG.glob("*.webp"):
         old.unlink()
-    C = lambda name: COVERS / f"{name}.webp"
+    IMG.mkdir(exist_ok=True)
+    px = lambda v: round(v * SCALE)
     cells = []
+    for bi, b in enumerate(layout["bands"]):
+        cuts = b["cuts"]
+        for ci, (x0, x1) in enumerate(zip(cuts, cuts[1:])):
+            name = f"{bi:02d}-{ci}.webp"
+            full.crop((px(x0), px(b["y0"]), px(x1), px(b["y1"]))).save(IMG / name, "WEBP", quality=92, method=6)
+            pct = "100%" if len(cuts) == 2 else f"{int((x1 - x0) / layout['W'] * 100 * 1000) / 1000}%"
+            cells.append(f'<a href="{esc(b["links"][ci])}"><img src="img/{name}" width="{pct}" align="top" alt="{esc(b["alts"][ci])}"></a>')
 
-    render(header_page(), C("00-header"), ROW_W, 420, 1)
-    cells.append(tile("https://dundysm.com", "covers/00-header.webp", shelf["header"]["name"] + ". " + shelf["header"]["intro"], "100%"))
-
-    for i, e in enumerate(shelf["merged"], 1):
-        out = C(f"{i:02d}-{slug(e['repo'])}")
-        render(merged_cover(e), out, TILE_W, TILE_H, 1.5)
-        prs = e["prs"]
-        href = (f"https://github.com/{e['repo']}/pull/{prs[0]}" if len(prs) == 1 else
-                f"https://github.com/{e['repo']}/pulls?q=is%3Apr+author%3A{USER}+is%3Amerged")
-        cells.append(tile(href, f"covers/{out.name}", f"{e['repo']}: {e['title']}", "25%"))
-
-    out = C(f"{len(shelf['merged']) + 1:02d}-in-review")
-    render(review_cover(), out, TILE_W, TILE_H, 1.5)
-    cells.append(tile(f"https://github.com/search?q=author%3A{USER}+is%3Apr+is%3Aopen+-user%3A{USER}&type=pullrequests",
-                      f"covers/{out.name}", "more prs open upstream, in review", "25%"))
-
-    render(label_page("built"), C("50-built"), ROW_W, 150, 1)
-    cells.append(tile("https://github.com/dundysm?tab=repositories", "covers/50-built.webp", "built", "100%"))
-    for e in shelf["built"]:
-        out = C(f"built-{slug(e['name'])}")
-        render(built_cover(e), out, TILE_W, TILE_H, 1.5)
-        cells.append(tile(f"https://github.com/{e['repo']}", f"covers/{out.name}", f"{e['repo']}: {e['sub']}", "25%"))
-
-    # footer: three equal images so each link is clickable on its own; equal sizes keep their bottom edges level
-    third = round(ROW_W / 3)
-    for k, (text, url) in enumerate(shelf["links"]):
-        out = C(f"99-footer-{k}")
-        render(footer_page(esc(text), third), out, third, 140, 1)
-        cells.append(tile(url, f"covers/{out.name}", text, "33.333%"))
-
-    readme = "\n".join([
-        "<!-- generated by build.py from shelf.json; edit those, not this file -->",
-        "<p>" + "".join(cells) + "</p>",
-        "",
-    ])
+    readme = "\n".join(["<!-- generated by build.py from shelf.json; edit those, not this file -->",
+                        "<p>" + "".join(cells) + "</p>", ""])
     (ROOT / "README.md").write_text(readme, encoding="utf-8")
-    print("README.md written")
+    kb = sum(p.stat().st_size for p in IMG.glob("*.webp")) // 1024
+    low = min(b["y1"] - b["y0"] for b in layout["bands"])
+    print(f"README.md: {len(cells)} images in {len(layout['bands'])} bands, {kb} KB, shortest band {low:.0f}px")
+    assert low >= 72, "a band under 72px shows a seam on phones (GitHub's 24px line strut at ~0.34 scale)"
 
 
 if __name__ == "__main__":

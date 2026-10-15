@@ -1,61 +1,39 @@
 {
-  "header": {"name": "dundy pasupuleti", "tagline": "ai infrastructure · robotics systems",
-             "intro": "most of my work lands upstream: fixes for inference serving, gpu clusters, training kernels and robot simulation."},
-  "domains": {
-    "inference": {"label": "inference serving",  "bg": "#12292a", "accent": "#8fd3c1"},
-    "kernels":   {"label": "training & kernels", "bg": "#2d1c15", "accent": "#eaa16f"},
-    "clusters":  {"label": "gpu clusters",       "bg": "#262212", "accent": "#d4af37"},
-    "robotics":  {"label": "robotics & sim",     "bg": "#161f33", "accent": "#a3bde9"},
-    "review":    {"label": "in review",          "bg": "#1f1e1c", "accent": "#d4af37"},
-    "built":     {"label": "built",              "bg": "#1b1a19", "accent": "#d4af37"}
-  },
-  "merged": [
-    {"repo": "vllm-project/production-stack", "domain": "inference", "prs": [1089, 1071, 1088], "date": "oct 2026",
-     "title": "the router stops latching onto busy backends"},
-    {"repo": "NVIDIA/TransformerEngine", "domain": "kernels", "prs": [3565], "date": "sep 2026",
-     "title": "no silent out-of-bounds bias reads in gemm"},
-    {"repo": "ray-project/ray", "domain": "inference", "prs": [66307], "date": "sep 2026",
-     "title": "serve metric staleness on the controller's own clock"},
-    {"repo": "ai-dynamo/dynamo", "domain": "inference", "prs": [15371], "date": "oct 2026",
-     "title": "images stop sharing each other's kv cache"},
-
-    {"repo": "google-deepmind/mujoco_menagerie", "domain": "robotics", "prs": [334], "date": "oct 2026",
-     "title": "go2 mjx joint limits, matched to the urdf"},
-    {"repo": "huggingface/candle", "domain": "kernels", "prs": [3973], "date": "sep 2026",
-     "title": "rms_norm and lazy VarMap, restored"},
-    {"repo": "NVIDIA/gpu-operator", "domain": "clusters", "prs": [2843], "date": "sep 2026",
-     "title": "the gpu operator runs restricted by default"},
-    {"repo": "moveit/moveit2", "domain": "robotics", "prs": [3853], "date": "sep 2026",
-     "title": "a data race in trajectory execution, closed"},
-
-    {"repo": "newton-physics/newton", "domain": "robotics", "prs": [4671], "date": "oct 2026",
-     "title": "ambient and colored light for the sensor camera"},
-    {"repo": "NVIDIA/TensorRT-Model-Connect", "domain": "inference", "prs": [1284], "date": "sep 2026",
-     "title": "tinyllama, no longer mistaken for phi"},
-    {"repo": "NVIDIA-NeMo/Automodel", "domain": "kernels", "prs": [3999], "date": "sep 2026",
-     "title": "nemotron-h checkpoints load either way"},
-    {"repo": "Mellanox/network-operator", "domain": "clusters", "prs": [3189, 3190], "date": "sep 2026",
-     "title": "the rdma device plugin on any kubelet root"},
-
-    {"repo": "ai-dynamo/aiperf", "domain": "inference", "prs": [1419], "date": "sep 2026",
-     "title": "gpu telemetry no longer hangs the profiler"},
-    {"repo": "Mellanox/maintenance-operator", "domain": "clusters", "prs": [243], "date": "sep 2026",
-     "title": "no more oomkills at 141 nodes"},
-    {"repo": "Roboparty/rpo_description", "domain": "robotics", "prs": [5], "date": "oct 2026",
-     "title": "humanoid joint limits synced, with a drift check"}
+  "areas": [
+    {"label": "inference serving", "accent": "#8fd3c1", "items": [
+      {"repo": "vllm-project/production-stack", "prs": [1089, 1071, 1088], "title": "the router stops latching onto busy backends"},
+      {"repo": "ray-project/ray", "prs": [66307], "title": "serve metric staleness on the controller's own clock"},
+      {"repo": "ai-dynamo/dynamo", "prs": [15371], "title": "images stop sharing each other's kv cache"},
+      {"repo": "NVIDIA/TensorRT-Model-Connect", "prs": [1284], "title": "tinyllama, no longer mistaken for phi"},
+      {"repo": "ai-dynamo/aiperf", "prs": [1419], "title": "gpu telemetry no longer hangs the profiler"}
+    ]},
+    {"label": "gpu clusters", "accent": "#d4af37", "items": [
+      {"repo": "NVIDIA/gpu-operator", "prs": [2843], "title": "the gpu operator runs restricted by default"},
+      {"repo": "Mellanox/network-operator", "prs": [3189, 3190], "title": "the rdma device plugin on any kubelet root"},
+      {"repo": "Mellanox/maintenance-operator", "prs": [243], "title": "no more oomkills at 141 nodes"}
+    ]},
+    {"label": "training & kernels", "accent": "#eaa16f", "items": [
+      {"repo": "NVIDIA/TransformerEngine", "prs": [3565], "title": "no silent out-of-bounds bias reads in gemm"},
+      {"repo": "huggingface/candle", "prs": [3973], "title": "rms_norm and lazy VarMap, restored"},
+      {"repo": "NVIDIA-NeMo/Automodel", "prs": [3999], "title": "nemotron-h checkpoints load either way"}
+    ]},
+    {"label": "robotics & sim", "accent": "#a3bde9", "items": [
+      {"repo": "google-deepmind/mujoco_menagerie", "prs": [334], "title": "go2 mjx joint limits, matched to the urdf"},
+      {"repo": "moveit/moveit2", "prs": [3853], "title": "a data race in trajectory execution, closed"},
+      {"repo": "newton-physics/newton", "prs": [4671], "title": "ambient and colored light for the sensor camera"},
+      {"repo": "Roboparty/rpo_description", "prs": [5], "title": "humanoid joint limits synced, with a drift check"}
+    ]}
   ],
-  "review_title": "next on the shelf",
   "review_orgs": ["NVIDIA", "vllm-project", "google-deepmind", "huggingface", "ray-project", "flashinfer-ai", "ollama", "kubernetes-sigs",
                   "kserve", "ai-dynamo", "NVIDIA-Omniverse", "Roboparty", "openvla", "mujocolab", "aws", "Mellanox"],
   "built": [
     {"repo": "dundysm/sea-of-fog", "art": "art/sea-of-fog.jpg", "pos": "50% 62%", "name": "sea of fog",
-     "sub": "would an ai general take napoleon's bait?", "tags": "blender · jev"},
+     "sub": "would an ai general take napoleon's bait?"},
     {"repo": "dundysm/forgetting", "art": "art/forgetting.jpg", "pos": "4% 50%", "name": "forgetting",
-     "sub": "vllm's kv cache, replayed inside a real brain", "tags": "vllm · webgl"},
+     "sub": "vllm's kv cache, replayed inside a real brain"},
     {"repo": "dundysm/gaitkeeper", "art": "art/gaitkeeper.jpg", "pos": "30% 50%", "name": "gaitkeeper",
-     "sub": "why a humanoid policy fails between simulators", "tags": "mujoco · cpu"},
+     "sub": "why a humanoid policy fails between simulators"},
     {"repo": "dundysm/inference-doctor", "art": "art/inference-doctor.jpg", "pos": "2% 50%", "name": "inference doctor",
-     "sub": "a regression gate that can say inconclusive", "tags": "vllm · aiperf · sglang"}
-  ],
-  "links": [["dundysm.com", "https://dundysm.com"], ["x.com/dundysm", "https://x.com/dundysm"], ["dundysm@gmail.com", "mailto:dundysm@gmail.com"]]
+     "sub": "a regression gate that can say inconclusive"}
+  ]
 }
