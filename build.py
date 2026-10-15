@@ -93,14 +93,14 @@ def page():
             out.append(band(f'{label}<div class="pair" data-cols>{cells}</div>', links, alts, "rowband" + gap))
 
     tiles = "".join(tile(o, "rt") for o in cfg["review_orgs"])
-    out.append(band(f'<div class="pg"><div class="hd2"><span class="mk" style="background:#d4af37"></span>'
+    out.append(band(f'<div class="pg"><div class="hd2"><span class="mk" style="background:#eaa16f"></span>'
                     f'<span class="ti2">in progress</span></div><div class="rts">{tiles}</div></div>'
                     f'<div class="lab built"><span>built</span></div>', [OPEN], ["in progress: open prs upstream; built"], "progress"))
 
     css = f"""
 html,body{{margin:0;background:#0d1117;color:#e6edf3;font-family:'JetBrains Mono',monospace}}
 #panel{{width:{W}px}}
-.lab{{display:flex;gap:17px;height:31px;align-items:flex-start;font-size:12px;line-height:14px;letter-spacing:.12em;color:#d4af37}}
+.lab{{display:flex;gap:17px;height:31px;align-items:flex-start;font-size:12px;line-height:14px;letter-spacing:.12em;color:#eaa16f}}
 .lab:after{{content:"";flex:1;height:1px;background:#1e242e;margin-top:7px}}
 .lab.built{{height:auto;margin-top:16px;padding-bottom:6px}}
 .pair{{display:grid;grid-template-columns:1fr 1fr;column-gap:13px}}

@@ -1,7 +1,7 @@
 {
   "rows": [
     [
-      {"label": "inference serving", "accent": "#8fd3c1", "items": [
+      {"label": "inference serving", "accent": "#eaa16f", "items": [
         {"repo": "vllm-project/production-stack", "prs": [1089, 1071, 1088],
          "desc": "prefix-aware routing fell back to windowed qps, which pinned sessions to saturated backends; now least-inflight"},
         {"repo": "ray-project/ray", "prs": [66307],
@@ -13,7 +13,7 @@
         {"repo": "ai-dynamo/aiperf", "prs": [1419],
          "desc": "a missing dcgm hostname label failed validation inside a swallowed task and hung aiperf profile"}
       ]},
-      {"label": "robotics & sim", "accent": "#a3bde9", "items": [
+      {"label": "robotics & sim", "accent": "#eaa16f", "items": [
         {"repo": "google-deepmind/mujoco_menagerie", "prs": [334],
          "desc": "go2 mjx back-thigh range and calf torque (24 vs 45.43 nm) had drifted from the urdf; now they match"},
         {"repo": "moveit/moveit2", "prs": [3853],
@@ -25,7 +25,7 @@
       ]}
     ],
     [
-      {"label": "gpu clusters", "accent": "#d4af37", "items": [
+      {"label": "gpu clusters", "accent": "#eaa16f", "items": [
         {"repo": "NVIDIA/gpu-operator", "prs": [2843],
          "desc": "the operator and its helm hook jobs ran without a securityContext; restricted defaults for k8s and openshift"},
         {"repo": "Mellanox/network-operator", "prs": [3189, 3190],
