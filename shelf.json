@@ -1,5 +1,6 @@
 {
-  "intro": "ai infrastructure and robotics systems. most of my work lands upstream: {merged} merged prs in {repos} repos, across inference serving, gpu clusters, training kernels and robot simulation.",
+  "header": {"name": "dundy pasupuleti", "tagline": "ai infrastructure · robotics systems",
+             "intro": "most of my work lands upstream: fixes for inference serving, gpu clusters, training kernels and robot simulation."},
   "domains": {
     "inference": {"label": "inference serving",  "bg": "#12292a", "accent": "#8fd3c1"},
     "kernels":   {"label": "training & kernels", "bg": "#2d1c15", "accent": "#eaa16f"},
@@ -43,7 +44,7 @@
     {"repo": "Roboparty/rpo_description", "domain": "robotics", "prs": [5], "date": "oct 2026",
      "title": "humanoid joint limits synced, with a drift check"}
   ],
-  "review_title": "{open} more, open upstream",
+  "review_title": "next on the shelf",
   "review_orgs": ["NVIDIA", "vllm-project", "google-deepmind", "huggingface", "ray-project", "flashinfer-ai", "ollama", "kubernetes-sigs",
                   "kserve", "ai-dynamo", "NVIDIA-Omniverse", "Roboparty", "openvla", "mujocolab", "aws", "Mellanox"],
   "built": [
@@ -56,5 +57,5 @@
     {"repo": "dundysm/inference-doctor", "art": "art/inference-doctor.jpg", "pos": "2% 50%", "name": "inference doctor",
      "sub": "a regression gate that can say inconclusive", "tags": "vllm · aiperf · sglang"}
   ],
-  "links": [["dundysm.com", "https://dundysm.com"], ["x", "https://x.com/dundysm"], ["dundysm@gmail.com", "mailto:dundysm@gmail.com"]]
+  "links": [["dundysm.com", "https://dundysm.com"], ["x.com/dundysm", "https://x.com/dundysm"], ["dundysm@gmail.com", "mailto:dundysm@gmail.com"]]
 }
