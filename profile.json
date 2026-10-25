@@ -65,9 +65,11 @@
      {
       "repo": "newton-physics/newton",
       "prs": [
-       4671
+       4780,
+       4671,
+       4777
       ],
-      "desc": "sky/ground ambient and per-light color for SensorCamera, wired into the warp kernel; defaults render unchanged"
+      "desc": "mjcf import parsed a mesh file again for every geom using it; now once per import (go2: 1924 → 972 ms)"
      },
      {
       "repo": "Roboparty/rpo_description",
@@ -75,6 +77,13 @@
        5
       ],
       "desc": "15 mjcf joint ranges and every motor limit had drifted from the urdf; synced, plus a script that fails on drift"
+     },
+     {
+      "repo": "Roboparty/human-humanoid-tools",
+      "prs": [
+       14
+      ],
+      "desc": "the wheel never shipped the reference poses, so lafan retargeting fell back to a synthetic rest pose; now packaged"
      }
     ]
    }
@@ -84,6 +93,15 @@
     "label": "gpu clusters",
     "accent": "#eaa16f",
     "items": [
+     {
+      "repo": "kubernetes-sigs/kueue",
+      "prs": [
+       16630,
+       17346,
+       17407
+      ],
+      "desc": "a new leader could schedule from a half-filled cache, so occupied nodes looked free and cohort quota went missing; now it waits for the initial sync"
+     },
      {
       "repo": "NVIDIA/gpu-operator",
       "prs": [
@@ -113,6 +131,13 @@
     "accent": "#eaa16f",
     "items": [
      {
+      "repo": "flashinfer-ai/flashinfer",
+      "prs": [
+       5335
+      ],
+      "desc": "the blackwell gdn kernel freed a tmem stage while loads from it were in flight, so the next mma could overwrite it; now fenced"
+     },
+     {
       "repo": "NVIDIA/TransformerEngine",
       "prs": [
        3565
@@ -139,23 +164,37 @@
  ],
  "review_orgs": [
   "NVIDIA",
+  "NVIDIA-NeMo",
   "vllm-project",
-  "google-deepmind",
-  "huggingface",
-  "ray-project",
-  "flashinfer-ai",
-  "ollama",
-  "kubernetes-sigs",
-  "kserve",
+  "sgl-project",
   "ai-dynamo",
-  "NVIDIA-Omniverse",
-  "Roboparty",
+  "flashinfer-ai",
+  "ray-project",
+  "kserve",
+  "google-deepmind",
+  "newton-physics",
+  "isaac-sim",
+  "huggingface",
   "openvla",
   "mujocolab",
-  "aws",
-  "Mellanox"
+  "Mellanox",
+  "ollama",
+  "aws"
  ],
  "projects": [
+  {
+   "href": "https://github.com/dundysm/occlubench",
+   "alt": "occlubench: a mocap plate slides into one camera mid-episode; every occluded rollout is paired with a clean one, on mujoco warp",
+   "art": "covers/occlubench.png",
+   "title": "occlubench",
+   "desc": "a mocap plate slides into one camera mid-episode; every occluded rollout is paired with a clean one, on mujoco warp",
+   "tags": [
+    "mujoco warp",
+    "vla evals",
+    "franka panda",
+    "paired rollouts"
+   ]
+  },
   {
    "href": "https://dundysm.github.io/forgetting/",
    "alt": "forgetting: replays vllm v1's lru block manager over measured runs; each kv token slot is a point on an mri-derived cortex in three.js",
@@ -245,19 +284,6 @@
     "speech-to-text",
     "llm structured output",
     "mv3 extension"
-   ]
-  },
-  {
-   "href": "https://dundysm.com",
-   "alt": "spine ai: orthanc c-store ingest, sagittal t2 slices to claude for findings and impression, fastapi backend with a cornerstone.js viewer",
-   "art": "covers/spine-ai.png",
-   "title": "spine ai",
-   "desc": "orthanc c-store ingest, sagittal t2 slices to claude for findings and impression, fastapi backend with a cornerstone.js viewer",
-   "tags": [
-    "claude vision",
-    "dicom",
-    "pacs / orthanc",
-    "radiology ai"
    ]
   }
  ]
