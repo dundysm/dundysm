@@ -196,32 +196,6 @@
    ]
   },
   {
-   "href": "https://dundysm.github.io/forgetting/",
-   "alt": "forgetting: replays vllm v1's lru block manager over measured runs; each kv token slot is a point on an mri-derived cortex in three.js",
-   "art": "covers/forgetting.png",
-   "title": "forgetting",
-   "desc": "replays vllm v1's lru block manager over measured runs; each kv token slot is a point on an mri-derived cortex in three.js",
-   "tags": [
-    "vllm v1",
-    "kv cache",
-    "prefix caching",
-    "lru eviction"
-   ]
-  },
-  {
-   "href": "https://dundysm.github.io/center-of-mass/",
-   "alt": "center of mass: mujoco wasm at 200 hz runs unitree's g1 policy at 50 hz; a gaussian-splat scan becomes collision boxes with a* paths",
-   "art": "covers/center-of-mass.png",
-   "title": "center of mass",
-   "desc": "mujoco wasm at 200 hz runs unitree's g1 policy at 50 hz; a gaussian-splat scan becomes collision boxes with a* paths",
-   "tags": [
-    "mujoco wasm",
-    "rl policy",
-    "gaussian splats",
-    "unitree g1"
-   ]
-  },
-  {
    "href": "https://github.com/dundysm/inference-under-pressure",
    "alt": "inference under pressure: pre-registered vllm + dynamo experiments on kv budget, session affinity and kv-aware routing, from one a40 to 2× l40s",
    "art": "covers/inference-under-pressure.png",
@@ -232,19 +206,6 @@
     "nvidia dynamo",
     "kv-aware routing",
     "multi-gpu serving"
-   ]
-  },
-  {
-   "href": "https://github.com/dundysm/sea-of-fog",
-   "alt": "sea of fog: typesafe's new jev model takes napoleon's bait at austerlitz 79% of the time; one warning line cuts that to 44%",
-   "art": "covers/sea-of-fog.png",
-   "title": "sea of fog",
-   "desc": "typesafe's new jev model plays the allies at austerlitz: it takes napoleon's bait 79% of the time; one warning line cuts that to 44%",
-   "tags": [
-    "typesafe jev",
-    "blender",
-    "decision eval",
-    "prompt ablation"
    ]
   },
   {
@@ -274,6 +235,32 @@
    ]
   },
   {
+   "href": "https://dundysm.github.io/center-of-mass/",
+   "alt": "center of mass: mujoco wasm at 200 hz runs unitree's g1 policy at 50 hz; a gaussian-splat scan becomes collision boxes with a* paths",
+   "art": "covers/center-of-mass.png",
+   "title": "center of mass",
+   "desc": "mujoco wasm at 200 hz runs unitree's g1 policy at 50 hz; a gaussian-splat scan becomes collision boxes with a* paths",
+   "tags": [
+    "mujoco wasm",
+    "rl policy",
+    "gaussian splats",
+    "unitree g1"
+   ]
+  },
+  {
+   "href": "https://dundysm.github.io/forgetting/",
+   "alt": "forgetting: replays vllm v1's lru block manager over measured runs; each kv token slot is a point on an mri-derived cortex in three.js",
+   "art": "covers/forgetting.png",
+   "title": "forgetting",
+   "desc": "replays vllm v1's lru block manager over measured runs; each kv token slot is a point on an mri-derived cortex in three.js",
+   "tags": [
+    "vllm v1",
+    "kv cache",
+    "prefix caching",
+    "lru eviction"
+   ]
+  },
+  {
    "href": "https://chromewebstore.google.com/detail/retinaflow/pldbmpjgjikjadekeikikhomahjeplee",
    "alt": "retinaflow: mv3 extension: web speech dictation → claude via a cloudflare worker → an action plan that fills the emr's exam and plan fields",
    "art": "covers/retinaflow.png",
@@ -284,6 +271,19 @@
     "speech-to-text",
     "llm structured output",
     "mv3 extension"
+   ]
+  },
+  {
+   "href": "https://github.com/dundysm/sea-of-fog",
+   "alt": "sea of fog: typesafe's new jev model takes napoleon's bait at austerlitz 79% of the time; one warning line cuts that to 44%",
+   "art": "covers/sea-of-fog.png",
+   "title": "sea of fog",
+   "desc": "typesafe's new jev model plays the allies at austerlitz: it takes napoleon's bait 79% of the time; one warning line cuts that to 44%",
+   "tags": [
+    "typesafe jev",
+    "blender",
+    "decision eval",
+    "prompt ablation"
    ]
   }
  ]
