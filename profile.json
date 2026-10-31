@@ -223,15 +223,15 @@
   },
   {
    "href": "https://github.com/dundysm/inference-doctor",
-   "alt": "inference doctor: welch t interval on the log ratio of repeated runs; reads vllm, aiperf, guidellm and sglang output, ships as a github action",
+   "alt": "inference doctor: welch t gate on repeated runs; now also $/1m tokens, idle-gpu $ and ranked cost fixes from vllm and sglang metrics",
    "art": "covers/inference-doctor.png",
    "title": "inference doctor",
-   "desc": "welch t interval on the log ratio of repeated runs; reads vllm, aiperf, guidellm and sglang output, ships as a github action",
+   "desc": "welch t gate on repeated runs; now also $/1m tokens, idle-gpu $ and ranked cost fixes from vllm and sglang metrics",
    "tags": [
     "vllm",
     "sglang",
-    "aiperf",
-    "perf regression ci"
+    "perf regression ci",
+    "gpu cost"
    ]
   },
   {
