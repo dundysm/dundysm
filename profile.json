@@ -183,6 +183,19 @@
  ],
  "projects": [
   {
+   "href": "https://github.com/dundysm/r1-sparring-gym",
+   "alt": "r1 sparring gym: mjlab footwork policies for a simulated unitree r1, sparring a second r1 on its own motors; 127/128 hard held-out bouts survived",
+   "art": "covers/r1-sparring-gym.png",
+   "title": "r1 sparring gym",
+   "desc": "mjlab footwork policies for a simulated unitree r1, sparring a second r1 on its own motors; 127/128 hard held-out bouts survived",
+   "tags": [
+    "unitree r1",
+    "mjlab",
+    "mujoco",
+    "held-out evals"
+   ]
+  },
+  {
    "href": "https://github.com/dundysm/occlubench",
    "alt": "occlubench: a mocap plate slides into one camera mid-episode; every occluded rollout is paired with a clean one, on mujoco warp",
    "art": "covers/occlubench.png",
@@ -258,19 +271,6 @@
     "kv cache",
     "prefix caching",
     "lru eviction"
-   ]
-  },
-  {
-   "href": "https://chromewebstore.google.com/detail/retinaflow/pldbmpjgjikjadekeikikhomahjeplee",
-   "alt": "retinaflow: mv3 extension: web speech dictation → claude via a cloudflare worker → an action plan that fills the emr's exam and plan fields",
-   "art": "covers/retinaflow.png",
-   "title": "retinaflow",
-   "desc": "mv3 extension: web speech dictation → claude via a cloudflare worker → an action plan that fills the emr's exam and plan fields",
-   "tags": [
-    "claude api",
-    "speech-to-text",
-    "llm structured output",
-    "mv3 extension"
    ]
   },
   {
