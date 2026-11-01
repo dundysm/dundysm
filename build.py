@@ -11,7 +11,7 @@ In the README every image is a <picture> (GitHub wraps it in <themed-picture>, s
 set inline, edge to edge, with align="top": GitHub strips style and bgcolor and pads floated images, and each line
 of inline images gets a 24px strut, so no slice may be shorter than ~120px at 2x or phones show a seam.
 """
-import base64, html, io, json, pathlib, re, subprocess, urllib.request
+import base64, hashlib, html, io, json, pathlib, re, subprocess, urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent
 CACHE = ROOT / ".cache"
@@ -233,12 +233,15 @@ def build():
         for ci, (x0, x1) in enumerate(zip(cuts, cuts[1:])):
             name = f"{bi:02d}-{ci}.png"
             box = (px(x0), px(b["y0"]), px(x1), px(b["y1"]))
+            ver = {}
             for t, (_, full) in renders.items():
                 full.crop(box).save(IMG / t / name, optimize=True)
+                # content hash in the URL: browsers cache raw images under their URL, so a changed slice needs a new one
+                ver[t] = hashlib.md5((IMG / t / name).read_bytes()).hexdigest()[:8]
             # width from the crop's own pixel width, so every slice in a band scales to exactly the same height
             pct = "100%" if len(cuts) == 2 else f"{int((box[2] - box[0]) / px(layout['W']) * 100 * 10000) / 10000}%"
             cells.append(f'<a href="{esc(b["links"][ci])}"><picture><source media="(prefers-color-scheme: dark)" '
-                         f'srcset="{RAW}img/dark/{name}"><img src="{RAW}img/light/{name}" width="{pct}" align="top" '
+                         f'srcset="{RAW}img/dark/{name}?v={ver["dark"]}"><img src="{RAW}img/light/{name}?v={ver["light"]}" width="{pct}" align="top" '
                          f'alt="{esc(b["alts"][ci])}"></picture></a>')
 
     (ROOT / "README.md").write_text("<p>" + "".join(cells) + "</p>\n", encoding="utf-8")

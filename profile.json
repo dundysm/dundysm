@@ -38,9 +38,17 @@
      {
       "repo": "ai-dynamo/aiperf",
       "prs": [
+       1436,
        1419
       ],
-      "desc": "a missing dcgm hostname label failed validation inside a swallowed task and hung aiperf profile"
+      "desc": "late warmup histogram samples leaked into profiling server metrics; warmup now waits for the flush before its last scrape"
+     },
+     {
+      "repo": "vllm-project/router",
+      "prs": [
+       456
+      ],
+      "desc": "proxy-connection, a hop-by-hop alias of connection, was forwarded to workers; now stripped both ways"
      }
     ]
    },
@@ -48,6 +56,13 @@
     "label": "robotics & sim",
     "accent": "#eaa16f",
     "items": [
+     {
+      "repo": "google-deepmind/mujoco_warp",
+      "prs": [
+       1813
+      ],
+      "desc": "contact sensors asking for linvel or angvel raised NotImplementedError; now computed in the velocity stage, matching mujoco c"
+     },
      {
       "repo": "google-deepmind/mujoco_menagerie",
       "prs": [
@@ -66,6 +81,7 @@
       "repo": "newton-physics/newton",
       "prs": [
        4780,
+       4782,
        4671,
        4777
       ],
@@ -118,6 +134,13 @@
       "desc": "the rdma shared device plugin assumed /var/lib/kubelet; the kubelet root is now configurable through helm"
      },
      {
+      "repo": "Mellanox/k8s-rdma-shared-dev-plugin",
+      "prs": [
+       329
+      ],
+      "desc": "when daemonset pods overlapped, the exiting one unlinked the new socket and rdma capacity dropped to zero; now only the owner removes it"
+     },
+     {
       "repo": "Mellanox/maintenance-operator",
       "prs": [
        243
@@ -164,22 +187,22 @@
  ],
  "review_orgs": [
   "NVIDIA",
-  "NVIDIA-NeMo",
-  "vllm-project",
-  "sgl-project",
-  "ai-dynamo",
-  "flashinfer-ai",
-  "ray-project",
-  "kserve",
   "google-deepmind",
-  "newton-physics",
-  "isaac-sim",
+  "dimforge",
+  "vllm-project",
+  "ray-project",
+  "apache",
+  "ai-dynamo",
+  "NVIDIA-NeMo",
+  "sgl-project",
   "huggingface",
+  "tracel-ai",
   "openvla",
-  "mujocolab",
-  "Mellanox",
-  "ollama",
-  "aws"
+  "flashinfer-ai",
+  "kserve",
+  "isaac-sim",
+  "kubernetes-sigs",
+  "ollama"
  ],
  "projects": [
   {
